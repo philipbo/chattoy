@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -16,12 +17,14 @@ var (
 )
 
 func main() {
-	port := ":8080"
-	listener, err := net.Listen("tcp", port)
+	port := flag.String("p", ":3000", "chat server port")
+	flag.Parse()
+
+	listener, err := net.Listen("tcp", *port)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("chat server on %v", port)
+	log.Printf("chat server on %v", *port)
 
 	go broadcaster()
 	for {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io"
 	"log"
 	"net"
@@ -8,7 +9,10 @@ import (
 )
 
 func main() {
-	conn, err := net.Dial("tcp", ":8080")
+	port := flag.String("p", ":3000", "chat server port")
+	flag.Parse()
+
+	conn, err := net.Dial("tcp", *port)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -17,16 +21,14 @@ func main() {
 
 	go func() {
 		io.Copy(os.Stdout, conn) // NOTE: ignoring errors
-		log.Println("---> done")
 		done <- struct{}{}
 	}()
 
-   go mustCopy(conn, os.Stdin)
+	go mustCopy(conn, os.Stdin)
 
-	log.Println(1111)
-	<- done // wait for background goroutine to finish
+	<-done // wait for background goroutine to finish
 	conn.Close()
-	log.Println("*****done*****")
+	log.Println("*****Quit*****")
 }
 
 func mustCopy(dst io.Writer, src io.Reader) {
